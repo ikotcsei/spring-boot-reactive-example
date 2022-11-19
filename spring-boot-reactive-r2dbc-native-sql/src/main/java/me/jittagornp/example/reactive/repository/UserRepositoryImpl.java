@@ -26,14 +26,14 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Flux<UserEntity> findAll() {
-        return databaseClient.execute("SELECT * FROM app.user")
+        return databaseClient.execute("SELECT * FROM user")
                 .map(this::convert)
                 .all();
     }
 
     @Override
     public Mono<UserEntity> findById(final UUID id) {
-        return databaseClient.execute("SELECT * FROM app.user WHERE id = :id")
+        return databaseClient.execute("SELECT * FROM public.user WHERE id = :id")
                 .bind("id", id)
                 .map(this::convert)
                 .one()
@@ -44,7 +44,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Mono<UserEntity> create(final UserEntity entity) {
         entity.setId(UUID.randomUUID());
         return databaseClient.execute(
-                "INSERT INTO app.user (id, username, first_name, last_name) " +
+                "INSERT INTO public.user (id, username, first_name, last_name) " +
                         "VALUES (:id, :username, :first_name, :last_name)"
         )
                 .bind("id", entity.getId())
@@ -60,7 +60,7 @@ public class UserRepositoryImpl implements UserRepository {
         return findById(entity.getId())
                 .flatMap(dbEntity -> {
                     return databaseClient.execute(
-                            "UPDATE app.user " +
+                            "UPDATE public.user " +
                                     "SET username = :username, first_name = :first_name, last_name = :last_name " +
                                     "WHERE id = :id"
                     )
@@ -75,7 +75,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Mono<Void> deleteAll() {
-        return databaseClient.execute("DELETE FROM app.user")
+        return databaseClient.execute("DELETE FROM public.user")
                 .then();
     }
 
@@ -83,7 +83,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Mono<Void> deleteById(final UUID id) {
         return findById(id)
                 .flatMap(dbEntity -> {
-                    return databaseClient.execute("DELETE FROM app.user WHERE id = :id")
+                    return databaseClient.execute("DELETE FROM public.user WHERE id = :id")
                             .bind("id", id)
                             .then();
                 });
